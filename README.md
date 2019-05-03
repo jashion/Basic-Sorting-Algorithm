@@ -105,9 +105,30 @@ func insertSort(sortedList: inout [Int]) {
 
 #### 前面介绍的三个排序是最基本的排序，下面介绍的三个排序是前面三个基本排序的升级版。
 
-
-
 #### 希尔排序：希尔排序是插入排序的升级版，通过设置increment（增量），把数组分成increment组，分别进行插入排序。然后，increment不断的减少，最终一定是increment=1，也就是整个数组进行插入排序，得出有序的序列。
+
+```swift
+//希尔排序
+func shellSort(sortedList: inout [Int]) {
+    let length = sortedList.count
+    var increment = length
+
+    repeat{
+        increment = increment/3+1
+        for i in 0..<length {
+            if i >= increment && sortedList[i] < sortedList[i-increment] {
+                let temp = sortedList[i]
+                var j: Int = i-increment
+                while j >= 0 && sortedList[j] > temp {
+                    sortedList[j+increment] = sortedList[j]
+                    j -= increment
+                }
+                sortedList[j+increment] = temp
+            }
+        }
+    }while increment > 1
+}
+```
 
 时间复杂度：因为希尔排序是通过不同的增量来进行分组，然后每组进行插入排序的，也就是说增量的取值直接影响到希尔排序的时间复杂度。但是，在我看来，希尔排序说到底属于插入排，那么一开始increment=1，也就是希尔排序的最好时间复杂度和最坏时间复杂度都是和插入排序相同的，也就是O(n)~O(n^2)，平均时间复杂度比较复杂，由于不同的增量取值，导致时间不一样，有时间复杂度为O(n^1.3)和O(n^1.5)的增量取值，大家可以了解一下。
 
@@ -121,6 +142,43 @@ func insertSort(sortedList: inout [Int]) {
 
 #### 堆排序：堆排序是选择排序的升级版，通过一次次的构建大顶堆，不断获取堆中最大的数据，直到堆中没有数据，也就是所有数据都有序了。
 
+```swift
+//堆排序
+ func heapSort(sortedList: inout [Int]) {
+    sortedList.insert(sortedList.count, at: 0)
+    let length = sortedList[0]
+
+    for i in stride(from: length/2, through: 1, by: -1) {
+        headAdjust(sortedList: &sortedList, index: i, length: length)
+    }
+
+    for i in stride(from: length, to: 1, by: -1) {
+        sortedList.swapAt(1, i)
+        headAdjust(sortedList: &sortedList, index: 1, length: i-1)
+    }
+
+    sortedList.removeFirst()
+ }
+
+ func headAdjust(sortedList: inout [Int], index: Int, length: Int) {
+    let temp = sortedList[index]
+    var s = index;  //根, index从1开始算
+    var j = index*2  //左子树
+    while j <= length {
+        if j < length && sortedList[j] < sortedList[j+1] {
+            j++
+        }
+        if temp >= sortedList[j] {
+            break
+        }
+        sortedList[s] = sortedList[j]
+        s = j;
+        j = s*2  //左子树
+    }
+    sortedList[s] = temp
+ }
+```
+
 最好时间复杂度：开始就是大顶堆，第一次构建，只需要比较，不需要移动，所有的数据至少需要比较一次，时间复杂度为：O(n)。然后，从第二次开始，由于每次都是取叶结点的数据取代根结点，所以，每次都需要比较和移动logi(i为当前构建大顶堆的结点数)，也就是时间复杂度为：log(n-1)+log(n-2)+...+log(1)=log((n-1)!)=(n-1)log(n-1)（nlogn=logn!这个等式证明请自行百度），也就是时间复杂度为：O(nlogn)。
 
 最坏时间复杂度：开始就是小顶堆，第一次构建，每个数据都需要比较和移动，也是O(n)的复杂度。从第二次开始，其实和最好情况的大顶堆是一样的，都需要比较和移动那么多的次数，时间复杂度都是：O(nlogn)。
@@ -132,3 +190,107 @@ func insertSort(sortedList: inout [Int]) {
 排序类型：内排。
 
 
+
+#### 快速排序：快速排序是冒泡排序的升级版，归根到底是比较排序的一种。通过关键数，将数组分成左右两个数组，左边都小于关键数，右边都大于关键数，然后左右两个数组继续分下去，直到所有数据都有序。
+
+```swift
+ //快速排序
+ func fastSort(sortedList: inout [Int]) {
+    sort(sortedList: &sortedList, start: 0, end: sortedList.count-1)
+ }
+
+ func sort(sortedList: inout [Int], start: Int, end: Int) {
+    if start < end {
+        let m = partion(sortedData: &sortedList, start: start, end: end)
+        sort(sortedList: &sortedList, start: start, end: m-1)
+        sort(sortedList: &sortedList, start: m+1, end: end)
+    }
+ }
+
+ //pivot = sortedData[start]
+ func partion(sortedData: inout [Int], start: Int, end: Int) -> Int {
+    let pivot = sortedData[start]
+    var left = start
+    var right = end
+
+    while left < right {
+        while left < right && sortedData[right] >= pivot {
+            right--
+        }
+        sortedData.swapAt(left, right)
+        while left < right && sortedData[left] <= pivot {
+            left++
+        }
+        sortedData.swapAt(left, right)
+    }
+    return left
+ }
+```
+
+最好时间复杂度：快速排序不断的把数组分成两边，相当于一棵二叉树，由二叉树的知识可以知道，完全二叉树的深度最小，为depth =⎣logn⎦+1，也就是说，当数据比较均匀的分布在二叉树的左右两边，则时间复杂度最小。假设快速排序的时间复杂度为：T(n)，第一次需要遍历整个数据，然后把数据分成均匀的两部分，则时间复杂度为：T(n)=2T(n/2)+n，同理，T(n/2)=2T(n/4)+n/2，T(n/4)=2T(n/8)+n/8，则T(n)=2T(n/2)+n=2(2T(n/4)+n/2)+n=4T(n/4)+2n=4(2T(n/8)+n/4)+2n=8T(n/8)+3n=...=nT(n/n)+nlogn=nT(1)+nlogn=nlogn。因为完全二叉树的深度为logn，所以递归调用了logn次，并且直到分到叶子结点，也就是T(1)，T(1)=0，所以，T(n)=nlogn。因此，快速排序的时间复杂度为：O(nlogn)。
+
+最坏时间复杂度：由二叉树的知识可以直到，斜树的深度最大，为depth=n，也就是当整个数组元素构造成一棵斜树，那么，该时间复杂度最高。由最好时间复杂度得出的公式，可以用在最坏时间复杂度的计算，也就是：T(n)=T(n-2)+n-1=T(n-3)+n-1+n-2=T(n-4)+n-1+n-2+n-3=...=n-1+n-2+n-3+...+1=((n-1)*n)/2，所以，最坏时间复杂度为：O(n2)。
+
+空间复杂度：最好的情况，需要进行logn次递归，所以空间复杂度为：O(logn)，最坏的情况，需要进行n-1次递归，所以空间复杂度为：O(n)，因此，空间复杂度为：O(logn)~O(n)。
+
+稳定性：存在数据元素跳跃的问题，是不稳定的排序。
+
+排序类型：内排。
+
+
+
+#### 归并排序：先没两个数据元素归并成一个有序的整体，然后有序的整体再两两归并成一个更大的有序整体，直到归并所有的数据元素，形成一个有序的整体。
+
+```
+ //归并排序
+ func mergeSort(sortedList: inout [Int]) {
+    var result: [Int] = Array.init(repeating: 0, count: sortedList.count)
+    sort(sortedList: &sortedList, result: &result, start: 0, end: sortedList.count-1)
+ }
+
+ func sort(sortedList: inout [Int], result: inout [Int], start: Int, end: Int) {
+    var result2: [Int] = Array.init(repeating: 0, count: MAXSIZE)
+    if start == end {
+        result[start] = sortedList[start]
+    } else {
+        let m = (end+start)/2
+        sort(sortedList: &sortedList, result: &result2, start: start, end: m)
+        sort(sortedList: &sortedList, result: &result2, start: m+1, end: end)
+        merge(left: &result2, right: &result, start: start, middle: m, end: end)
+    }
+ }
+
+ func merge(left: inout [Int], right: inout [Int], start: Int, middle: Int, end: Int) {
+    var i = start, j = middle+1, k = start
+    while i <= middle && j <= end {
+        if left[i] < left[j] {
+            right[k] = left[i]
+            i++
+        } else {
+            right[k] = left[j]
+            j++
+        }
+        k++
+    }
+
+    if i <= middle {
+        for l in 0...middle-i {
+            right[k+l] = left[i+l]
+        }
+    }
+    if j <= end {
+        for l in 0...end-j {
+            right[k+l] = left[j+l]
+        }
+    }
+ }
+
+```
+
+时间复杂度：因为两两归并，其实就是一棵完全二叉树，所以，最好和最坏的时间复杂度都是一样的，二叉树的深度为：logn，并且需要比较n次，所以为：O(nlogn)。
+
+空间复杂度：需要n个额外的辅助空间存结果，并且需要递归logn次，所以空间复杂度为：O(n+logn)，但是如果不采用递归，则需要：O(n)个空间。
+
+稳定性：因为两个有序的整体merge的时候并不涉及到数据的跳跃比较和移动，所以是稳定的。
+
+排序类型：外排，因为不需要刚开始就把所有的数据加载进内存进行排序。
