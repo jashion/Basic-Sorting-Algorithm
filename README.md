@@ -101,8 +101,6 @@ func insertSort(sortedList: inout [Int]) {
 
 排序类型：同冒泡排序一样，需要一次性把排序的数据加载到内存，所以是内排。
 
-
-
 #### 前面介绍的三个排序是最基本的排序，下面介绍的三个排序是前面三个基本排序的升级版。
 
 #### 希尔排序：希尔排序是插入排序的升级版，通过设置increment（增量），把数组分成increment组，分别进行插入排序。然后，increment不断的减少，最终一定是increment=1，也就是整个数组进行插入排序，得出有序的序列。
@@ -137,8 +135,6 @@ func shellSort(sortedList: inout [Int]) {
 稳定性：因为希尔排序是增量插入排序，存在跳跃比较和移动的情况，所以是不稳定的排序。
 
 排序类型：内排。
-
-
 
 #### 堆排序：堆排序是选择排序的升级版，通过一次次的构建大顶堆，不断获取堆中最大的数据，直到堆中没有数据，也就是所有数据都有序了。
 
@@ -189,8 +185,6 @@ func shellSort(sortedList: inout [Int]) {
 
 排序类型：内排。
 
-
-
 #### 快速排序：快速排序是冒泡排序的升级版，归根到底是比较排序的一种。通过关键数，将数组分成左右两个数组，左边都小于关键数，右边都大于关键数，然后左右两个数组继续分下去，直到所有数据都有序。
 
 ```swift
@@ -237,8 +231,6 @@ func shellSort(sortedList: inout [Int]) {
 
 排序类型：内排。
 
-
-
 #### 归并排序：先没两个数据元素归并成一个有序的整体，然后有序的整体再两两归并成一个更大的有序整体，直到归并所有的数据元素，形成一个有序的整体。
 
 ```
@@ -284,7 +276,6 @@ func shellSort(sortedList: inout [Int]) {
         }
     }
  }
-
 ```
 
 时间复杂度：因为两两归并，其实就是一棵完全二叉树，所以，最好和最坏的时间复杂度都是一样的，二叉树的深度为：logn，并且需要比较n次，所以为：O(nlogn)。
@@ -294,3 +285,111 @@ func shellSort(sortedList: inout [Int]) {
 稳定性：因为两个有序的整体merge的时候并不涉及到数据的跳跃比较和移动，所以是稳定的。
 
 排序类型：外排，因为不需要刚开始就把所有的数据加载进内存进行排序。
+
+#### 上面的排序：冒泡，选择，插入，希尔，快速，堆以及归并排序的时间复杂度（最坏时间复杂度）最好的是O(nlogn)相比于线性的时间复杂度还是要高点，下面的将要介绍的三种排序，是线性级的时间复杂度O(n)。
+
+#### 计数排序：适用于整数，分布均匀的数据。先找到整个数组最小和最大的整数，然后生（max-min+1）长度的数组，遍历整个数组，最小的放在第一位，最大的放在最后一位，其他数据的位置根据和最小数据的差值放置相应小标的位置，只需遍历一遍就可以把整个数组的数据变成有序。
+
+```swift
+//计数排序
+ func countSort(sortedList: inout [Int]) {
+    let min = sortedList.min()!
+    let max = sortedList.max()!
+    var result = Array.init(repeating: 0, count: max-min+1)
+        //排序
+   for num in sortedList {
+        result[num-min] = result[num-min]+1;
+    }
+    //打印
+    var result2: [Int] = []
+    for (index, value) in result.enumerated() {
+        for _ in 0..<value {
+            result2.append(index+min)
+        }
+    }
+    print(result2)
+ }
+```
+
+时间复杂度：排序时间复杂度为O(n)，结果遍历时间复杂度为O(k)（k为最大和最小的差值+1），所以，时间复杂度为：O(n+k)。
+
+空间复杂度：因为需要一个长度为k的数组接收结果，所以，空间复杂度为：O(k)。
+
+稳定性：因为数据是一个个放进去的，相同数字的前后顺序是不变的，所以，是稳定的排序算法。
+
+排序类型：外排，如果直到数据都是在哪一个数据段的，并不需要把所有的数据加载进内存，一个一个数据或者一部分一部分数据加载就可以了。
+
+#### 桶排序：计数排序的升级版，计数排序可以看作分成max-min+1个桶的排序。桶排序在计数排序的基础上，将max-min+1的数据段再分成k个桶，每个桶就是一个数据段，所有的桶数据段不会重叠，并且所有桶的数据段连起来就是max-min+1，先将所有数据加入桶里，然后桶里的数据再采用其他排序使桶里的数据有序，然后将所有桶的数据连接起来就是整个有序序列。
+
+```
+//桶排序
+ func bucketSort(sortedList: [Int]) -> [Int] {
+    let max = sortedList.max()!
+    let min = sortedList.min()!
+    let bucketSize = 20
+    let bucketCount = (max-min)/bucketSize+1
+    var buckets = Array.init(repeating: [Int](), count: bucketCount)
+    for num in sortedList {
+        let i = (num-min)/bucketSize
+        var bucket = buckets[i]
+        bucket.append(num)
+        buckets[i] = bucket //因为Swift是用时复制，所以需要把bucket重新赋值回去
+    }
+    var result = [Int]()
+    for var bucket in buckets {
+        insertSort(sortedList: &bucket) //桶里采用插入排序
+        result.append(contentsOf: bucket)
+    }
+    return result
+ }
+```
+
+最好时间复杂度：整个数据均匀分布在n个桶里，时间复杂度为：O(n)。
+
+最坏时间复杂度：所有数据都在一个桶里，则时间复杂度为：O(n2)。
+
+平均时间复杂度：遍历需要n遍，排序需要k遍，即时间复杂度为：O(n+km)(m和桶采取的排序算法有关)。假如，桶采取的排序算法平均的时间复杂度为O(nlogn)，则O(n+k(n/k)log(n/k))=O(n+n(logn-logk))=O(n+m)(m=n(logn-logk))。
+
+空间复杂度：需要额外k个桶作为辅助，并且排序结果也需要n个位置储存数据，所以为：O(n+k)。
+
+稳定性：因为桶里的排序用到的是插入排序，所有是稳定的。
+
+排序类型：外排。
+
+#### 基数排序：将数字按不同的数位比较，从低位到高位，位数不足的补零。也就是先按照各位排序，然后再按照十位排序，再按照百位排序...直到最高位。
+
+```swift
+ func radixSort(sortedList: [Int]) -> [Int] {
+    let max = sortedList.max()!
+    var result = Array.init(sortedList)
+    var buckets = Array.init(repeating: [Int](), count: 10)
+    let maxDigit = "\(max)".count
+    for i in 0..<maxDigit {  //d
+        let mod = (pow(10, i+1) as NSDecimalNumber).intValue
+        for num in result { //n
+            let j = num%mod/(mod/10)
+            var bucket = buckets[j]
+            bucket.append(num)
+            buckets[j] = bucket
+        }
+        var index = 0
+        for j in 0..<buckets.count {  //k
+            let bucket = buckets[j]
+            for k in 0..<bucket.count {
+                result[index+k] = bucket[k]
+            }
+            index = index+bucket.count
+            buckets[j] = []
+        }
+    }
+    return result
+ }
+```
+
+时间复杂度：由上面的代码上面可以知道，时间复杂度和maxDigit有关，并且遍历整个数组需要n遍，然后将所有桶的数组按顺序加入结果数组，所以，还需要加上遍历桶的数据的次数，则和k有关。所以，时间复杂度为：O(d(n+k))，k为基数，比如十进制k就是10。
+
+空间复杂度：因为用到了结果数据和基数个桶，所以为：O(n+k)。
+
+稳定性：稳定的，因为不会改变相同两个数据的前后关系。
+
+排序类型：外排。
