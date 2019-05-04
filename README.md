@@ -308,7 +308,7 @@ func shellSort(sortedList: inout [Int]) {
 
 排序类型：外排，因为不需要刚开始就把所有的数据加载进内存进行排序。
 
-#### 5.上面的排序：冒泡，选择，插入，希尔，快速，堆以及归并排序的时间复杂度（最坏时间复杂度）最好的是O(nlogn)相比于线性的时间复杂度还是要高点，下面的将要介绍的三种排序，是线性级的时间复杂度O(n)。
+#### 4.上面的排序：冒泡，选择，插入，希尔，快速，堆以及归并排序的时间复杂度（最坏时间复杂度）最好的是O(nlogn)相比于线性的时间复杂度还是要高点，下面的将要介绍的三种排序，是线性级的时间复杂度O(n)。
 
 #### 计数排序：适用于整数，分布均匀的数据。先找到整个数组最小和最大的整数，然后生（max-min+1）长度的数组，遍历整个数组，最小的放在第一位，最大的放在最后一位，其他数据的位置根据和最小数据的差值放置相应小标的位置，只需遍历一遍就可以把整个数组的数据变成有序。
 
@@ -418,4 +418,4 @@ func shellSort(sortedList: inout [Int]) {
 
 #### 友情链接：
 
-[JS-Sorting-Algorithm]([https://github.com/hustcc/JS-Sorting-Algorithm](https://github.com/hustcc/JS-Sorting-Algorithm)
+[JS-Sorting-Algorithm](https://github.com/hustcc/JS-Sorting-Algorithm)
