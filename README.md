@@ -43,8 +43,6 @@
 - [桶排序](#桶排序)
 - [基数排序](#基数排序)
 
----
-
 ## 冒泡排序
 
 两两相邻的数据比较，如果前面的数据比后面的数据大，则交换两个数据的位置，直到所有的数据有序。
@@ -274,7 +272,7 @@ func shellSort(sortedList: inout [Int]) {
 
 先没两个数据元素归并成一个有序的整体，然后有序的整体再两两归并成一个更大的有序整体，直到归并所有的数据元素，形成一个有序的整体。
 
-```
+```swift
  //归并排序
  func mergeSort(sortedList: inout [Int]) {
     var result: [Int] = Array.init(repeating: 0, count: sortedList.count)
@@ -364,7 +362,7 @@ func shellSort(sortedList: inout [Int]) {
 
 计数排序的升级版，计数排序可以看作分成max-min+1个桶的排序。桶排序在计数排序的基础上，将max-min+1的数据段再分成k个桶，每个桶就是一个数据段，所有的桶数据段不会重叠，并且所有桶的数据段连起来就是max-min+1，先将所有数据加入桶里，然后桶里的数据再采用其他排序使桶里的数据有序，然后将所有桶的数据连接起来就是整个有序序列。
 
-```
+```swift
 //桶排序
  func bucketSort(sortedList: [Int]) -> [Int] {
     let max = sortedList.max()!
