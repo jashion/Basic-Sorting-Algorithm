@@ -45,7 +45,9 @@
 
 ## 冒泡排序
 
-两两相邻的数据比较，如果前面的数据比后面的数据大，则交换两个数据的位置，直到所有的数据有序。
+第一个元素和第二个元素比较，如果大于则交换两个元素。继续第二个元素和第三个元素比较，如果大于则交换两个元素。相邻的两个元素不断比较，直到最后一个元素是最大的元素。然后，除了最后一个元素，前面的所有元素都重复上面的比较过程，直到整个数列有序。（因为越小的数经过不断比较交换慢慢“潜”到数列前面，像冒泡一样，所以做冒泡排序。）
+
+##### swift实现
 
 ```swift
 //Swift
@@ -66,6 +68,30 @@ func bubbleSort(sortedList: inout [Int]) {
 }
 ```
 
+##### C实现
+
+```c
+//C
+void bubbleSort(int arr[], int len) {
+    int i = 0, j;
+    int flag = 1;
+
+    while (i < len - 1 && flag == 1)
+    {
+        flag = 0;
+        for (j = 0; j < len - 1 - i; j++)
+        {
+            if (arr[j] > arr[j+1])
+            {
+                flag = 1;
+                swap(&arr[j], &arr[j+1]);
+            }
+        }
+        i++;
+    }
+}
+```
+
 最好时间复杂度：最好的情况就是需要排序的数据完全有序，也就是只需要比较n-1次，移动0次，就可以得到一个完全有序的序列，所以时间复杂度为：O(n)。
 
 最坏时间复杂度：需要排序的数据逆序，那么第一个数据需要比较n-1次，第二个数据需要比较n-2次，那么，总的比较时间为：n-1+n-2+n-3+...+1=(n^2-n)/2，也就是时间复杂度为：O(n^2)。
@@ -80,17 +106,42 @@ func bubbleSort(sortedList: inout [Int]) {
 
 ## 选择排序
 
-选择排序，每次都在无序的数据中选出最大的数据，并排在后面，直到所有的数据有序。
+选择排序，每次都在无序的数据中选出最小的数据，并排在起始位置，直到所有的数据有序。
+
+##### Swift实现
 
 ```swift
 //Swift
-func simpleSelectSort(sortedList: inout [Int]) {
-    for j in 0..<sortedList.count-1 {
-        for i in j+1..<sortedList.count {
-            if sortedList[j] > sortedList[i] {
-                sortedList.swapAt(j, i)
+ func selectSort(sortedList: inout [Int]) {
+    for i in 0..<sortedList.count-1 {
+        var index = i
+        for j in i+1..<sortedList.count {
+            if sortedList[j] < sortedList[i] {
+                index = j
             }
         }
+        sortedList.swapAt(i, index)
+    }
+ }
+```
+
+##### C实现
+
+```c
+//C
+void selectSort(int arr[], int len) {
+    int i, j, min;
+    for (i = 0; i < len-1; i++)
+    {
+        min = i;
+        for (j = i + 1; j < len; j++)
+        {
+            if (arr[min] > arr[j])
+            {
+                min = j;
+            }
+        }
+        swap(&arr[i], &arr[min]);
     }
 }
 ```
@@ -99,13 +150,15 @@ func simpleSelectSort(sortedList: inout [Int]) {
 
 空间复杂度：和冒泡排序一样，最多使用一个数据空间，所以空间复杂度为：O(1)。
 
-稳定性：因为需要在剩下的所有数据中寻找最大值，存在跳跃的情况，比如：5 4 5 3 2 => 4 3 5 2 5 很明显前面的5跑到后面来了，所以是不稳定的。
+稳定性：因为需要在剩下的所有数据中寻找最小值，存在跳跃的情况，比如：2 4 4+ 3 5 => 2 3 4+ 4 5 很明显后面的4跑到前面来了，所以是不稳定的。（因为选择排序是需要在未排序的列表找到最小值的下标，然后和未排序起始值交换，这时候起始值是被换到后面来了，如果它们之间还有和起始值相等的数值，则很明显两个相等数值前后相对位置交换了，所以是不稳定的。）
 
 排序类型：同冒泡排序一样，需要一次性把排序的数据加载到内存，所以是内排。
 
 ## 插入排序
 
 插入排序是不断的将数据插入前面有序的序列，形成新的有序序列。
+
+##### Swift实现
 
 ```swift
 //Swift
@@ -124,6 +177,24 @@ func insertSort(sortedList: inout [Int]) {
 }
 ```
 
+##### C实现
+
+```c
+//C
+void insertSort(int arr[], int len) {
+    int i, j, tmp;
+    for (i = 1; i < len; i++)
+    {
+        tmp = arr[i];
+        for (j = i; j > 0 && arr[j-1] > tmp; j--)
+        {
+            arr[j] = arr[j-1];
+        }
+        arr[j] = tmp;
+    }
+}
+```
+
 最好时间复杂度：如果排序的数据完全有序，则只需要比较n-1次，不需要移动数据，则最好的时间复杂度为：O(n)。
 
 最坏时间复杂度：如果排序的数据逆序，从第二数据开始，第一次在比较是否进入循环时，比较了一次，然后在循环比较移动时有比较了一次，也就是两次，总的时间复杂度为：2+3+4+...+n=(n+2)(n-1)/2，时间复杂度为：O(n^2)。
@@ -136,7 +207,9 @@ func insertSort(sortedList: inout [Int]) {
 
 ## 希尔排序
 
-希尔排序是插入排序的升级版，通过设置increment（增量），把数组分成increment组，分别进行插入排序。然后，increment不断的减少，最终一定是increment=1，也就是整个数组进行插入排序，得出有序的序列。
+希尔排序是插入排序的升级版，通过设置increment（增量），把数组分成increment组，分别进行插入排序。然后，increment不断的减少，最终一定是increment=1，也就是整个数组进行插入排序，得出有序的序列。（比如：nums[9, 8, 7, 6, 5, 4, 3, 2, 1]，increment=4，则分组：[9, 5, 1]，[8, 4]，[7, 3]，[6, 2]，每组分别进行插入排序，结果为：[1, 5, 9]，[4, 8]，[3, 7]，[2, 6]，整个数组结果为：[1, 4, 3, 2, 5, 8, 7, 6, 9 ]，相对有序，前部分相对小于后部分。）
+
+##### Swift实现
 
 ```swift
 //希尔排序
@@ -158,6 +231,30 @@ func shellSort(sortedList: inout [Int]) {
             }
         }
     }while increment > 1
+}
+```
+
+##### C实现
+
+```c
+//C
+void shellSort(int arr[], int len) {
+    int increment = len;
+    int i, j, tmp;
+
+    do
+    {
+        increment = increment/3 + 1;
+        for (i = 1; i < len; i++)
+        {
+            tmp = arr[i];
+            for (j = i; j >= increment && arr[j - increment] > tmp; j = j - increment)
+            {
+                arr[j] = arr[j - increment];
+            }
+            arr[j] = tmp;
+        }
+    } while (increment > 1);
 }
 ```
 
@@ -222,10 +319,12 @@ func shellSort(sortedList: inout [Int]) {
 
 ## 快速排序
 
-快速排序是冒泡排序的升级版，归根到底是比较排序的一种。通过关键数，将数组分成左右两个数组，左边都小于关键数，右边都大于关键数，然后左右两个数组继续分下去，直到所有数据都有序。
+快速排序是冒泡排序的升级版（冒泡排序每次只有一个元素沉底，而快速排序则以某个基准为准，多个元素沉底，其他的元素则像泡泡一样往水面移动。），归根到底是比较排序的一种。通过关键数，将数组分成左右两个数组，左边都小于关键数，右边都大于关键数，然后左右两个数组继续分下去，直到所有数据都有序。
+
+##### Swift实现
 
 ```swift
- //快速排序
+ //swift
  func fastSort(sortedList: inout [Int]) {
     sort(sortedList: &sortedList, start: 0, end: sortedList.count-1)
  }
@@ -256,6 +355,48 @@ func shellSort(sortedList: inout [Int]) {
     }
     return left
  }
+```
+
+##### C实现
+
+```c
+//c
+void fastSort(int arr[], int start, int end) {
+    if (start > end)
+    {
+        return;
+    }
+
+    int left = start;
+    int right = end;
+    int pivotkey = arr[left];
+
+    while(left < right)
+    {
+        while (left < right && arr[right] >= pivotkey)
+        {
+            right--;
+        }
+        if (left < right)
+        {
+            // arr[left++] = arr[right];
+            swap(&arr[left++], &arr[right]);
+        }
+
+        while (left < right && arr[left] < pivotkey)
+        {
+            left++;
+        }
+        if (left < right)
+        {
+            // arr[right--] = arr[left];
+            swap(&arr[right--], &arr[left]);
+        }
+    }
+    // arr[left] = pivotkey;
+    fastSort(arr, 0, left-1);
+    fastSort(arr, left+1, end);
+}
 ```
 
 最好时间复杂度：快速排序不断的把数组分成两边，相当于一棵二叉树，由二叉树的知识可以知道，完全二叉树的深度最小，为depth =⎣logn⎦+1，也就是说，当数据比较均匀的分布在二叉树的左右两边，则时间复杂度最小。假设快速排序的时间复杂度为：T(n)，第一次需要遍历整个数据，然后把数据分成均匀的两部分，则时间复杂度为：T(n)=2T(n/2)+n，同理，T(n/2)=2T(n/4)+n/2，T(n/4)=2T(n/8)+n/8，则T(n)=2T(n/2)+n=2(2T(n/4)+n/2)+n=4T(n/4)+2n=4(2T(n/8)+n/4)+2n=8T(n/8)+3n=...=nT(n/n)+nlogn=nT(1)+nlogn=nlogn。因为完全二叉树的深度为logn，所以递归调用了logn次，并且直到分到叶子结点，也就是T(1)，T(1)=0，所以，T(n)=nlogn。因此，快速排序的时间复杂度为：O(nlogn)。
@@ -440,3 +581,5 @@ func shellSort(sortedList: inout [Int]) {
 #### 友情链接：
 
 [JS-Sorting-Algorithm](https://github.com/hustcc/JS-Sorting-Algorithm)
+
+[Play-With-Sort-OC]([https://github.com/MisterBooo/Play-With-Sort-OC](https://github.com/MisterBooo/Play-With-Sort-OC)
