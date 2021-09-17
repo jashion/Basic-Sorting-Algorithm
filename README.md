@@ -582,4 +582,4 @@ void fastSort(int arr[], int start, int end) {
 
 [JS-Sorting-Algorithm](https://github.com/hustcc/JS-Sorting-Algorithm)
 
-[Play-With-Sort-OC]([https://github.com/MisterBooo/Play-With-Sort-OC](https://github.com/MisterBooo/Play-With-Sort-OC)
+[Play-With-Sort-OC](https://github.com/MisterBooo/Play-With-Sort-OC)
